@@ -61,34 +61,34 @@ command /test-tokens-gui:
 
 command /give-player-tokens <player> <number>:
     permission: op
-    permission message: &4Stop! &cYou cant use this command!
+    permission message: &4Stop! &cYou can't use this command!
     trigger:
         if arg-1 not set:
-            send "Incorect usage: /give-player-tokens <player> <amount>" to player
+            send "Incorrect usage: /give-player-tokens <player> <amount>" to player
         else if arg-2 not set:
-            send "Incorect usage: /give-player-tokens <player> <amount>" to player
+            send "Incorrect usage: /give-player-tokens <player> <amount>" to player
         else:
             add arg-2 to {Tokens::%uuid of arg-1%}
             send "&7Gave %{arg-1}% %{arg-2}% Tokens!" to player
     
 command /set-player-tokens <player> <number>:
     permission: op
-    permission message: &4Stop! &cYou cant use this command!
+    permission message: &4Stop! &cYou can't use this command!
     trigger:
         if arg-1 not set:
-            send "Incorect usage: /set-player-tokens <player> <amount>" to player
+            send "Incorrect usage: /set-player-tokens <player> <amount>" to player
         else if arg-2 not set:
-            send "Incorect usage: /set-player-tokens <player> <amount>" to player
+            send "Incorrect usage: /set-player-tokens <player> <amount>" to player
         else:
             set {Tokens::%uuid of arg-1%} to arg-2
             send "&7Set %{arg-1}%'s Tokens to %{arg-2}%!" to player
 
-command /restet-player-tokens <player>:
+command /reset-player-tokens <player>:
     permission: op
-    permission message: &4Stop! &cYou cant use this command!
+    permission message: &4Stop! &cYou can't use this command!
     trigger:
         if arg-1 not set:
-            send "Incorect usage: /restet-player-Tokens <player>" to player
+            send "Incorrect usage: /restet-player-Tokens <player>" to player
         else:
             set {Tokens::%uuid of arg-1%} to 0
             send "&7Set %{arg-1}%'s Tokens to 0!" to player
