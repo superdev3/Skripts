@@ -1,0 +1,37 @@
+options:
+
+
+
+command /admin-craft-gui:
+    permission: op
+    trigger:
+        send "&bAdmin+ &f%player% opened the &c&lAdmin Custom Recipes GUI" to the console
+        set {_gui} to a new chest inventory with 3 row with name "&c&lAdmin Custom Recipes GUI:"
+        set slot 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 19, 20, 21, 22, 23, 24, 25 and 26 of {_gui} to black stained glass pane named " "
+        set slot 10 of {_gui} to structure void named "&b&lStrong Bow" with lore "&7This Recipe is to enable the &b&lStrong Bow!" with all flags hidden
+        set slot 11 of {_gui} to structure void named "&7&oNothing" with lore "&7This Recipe has no purpose!" with all flags hidden
+        set slot 12 of {_gui} to structure void named "&7&oNothing" with lore "&7This Recipe has no purpose!" with all flags hidden
+        set slot 13 of {_gui} to structure void named "&7&oNothing" with lore "&7This Recipe has no purpose!" with all flags hidden
+        set slot 14 of {_gui} to structure void named "&7&oNothing" with lore "&7This Recipe has no purpose!" with all flags hidden
+        set slot 15 of {_gui} to structure void named "&7&oNothing" with lore "&7This Recipe has no purpose!" with all flags hidden
+        set slot 16 of {_gui} to barrier named "&c&lRestet &7(Disable all)" with lore "&cThis disables all the recepies!" with all flags hidden
+        open {_gui} to player
+
+on inventory click:
+    if name of event-inventory is "&c&lAdmin Custom Recipes GUI:":
+        cancel event                   
+        if event-slot is 10:
+            if CustomRecipe1 is true:
+                set CustomRecipe1 to false
+                wipe crafting recipes for bow
+                send "&cDisabled Custom Crafting Recipe for &b&lStrong Bow" to player
+                set slot 10 of {_gui} to structure void named "&b&lStrong Bow" with lore "&7This Recipe has no purpose!" with all flags hidden
+            else:
+                set sCustomRecipe1 to true
+                send "&aEnabled Custom Crafting Recipe for &b&lStrong Bow" to player
+                set slot 10 of {_gui} to structure void of mending named "&b&lStrong Bow" with lore "&7This Recipe is to enable the &b&lStrong Bow!" with all flags hidden
+                register new shaped recipe for bow of power 7 named "&b&lStrong Bow" with lore "&7Has a lot of extra power" with all flags hidden using air, stick, string, stick, air, diamond, air, stick, string
+        else if event-slot is 16:           
+            wipe all crafting recipes     
+        else:
+            send "&cThis Recipe has no purpose!" to player

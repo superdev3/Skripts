@@ -1,0 +1,35 @@
+command /keyall:
+    permission: op, console
+    trigger:
+        send title "&aKeyall &fin 10 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 9 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 8 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 7 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player 
+        wait 1 seconds
+        send title "&aKeyall &fin 6 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 5 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 4 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 3 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 2 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 1 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        send "&bHey player, you got a key!" to all players
+        execute console command "excellentcrates key giveall key_all_crate_key 1"
+        send title "&f&l&ks &6&lKeyall over! &f&l&ks" with subtitle " " to all players for 3 seconds

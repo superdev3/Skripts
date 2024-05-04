@@ -1,0 +1,4 @@
+on load:
+    register new shapelss recipe for dirt using diamond, diamond, diamond, diamond, air, air, air, air, air
+    register new shaped recipe for bow of power 7 named "&b&lStrong Bow" with lore "&7Has a lot of extra power" with all flags hidden using air, stick, string, stick, air, diamond, air, stick, string
+    register new shapelss recipe for potato named "&e&lHot Potato" using potato, flint and steal, air, air, air, air, air, air, air

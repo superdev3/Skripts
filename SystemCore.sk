@@ -1,0 +1,153 @@
+on load:
+    set {ChatColor1GuiItem} to red dye of mending named "&c&lRed Chat Color" with lore "&7&lCost: 2 Tokens" with all item flags hidden
+    set {ChatColor2GuiItem} to green dye of mending named "&2&lGreen Chat Color" with lore "&7&lCost: 2 Tokens" with all item flags hidden
+    set {ChatColor3GuiItem} to blue dye of mending named "&1&lBlue Chat Color" with lore "&7&lCost: 2 Tokens" with all item flags hidden
+    set {ChatColor4GuiItem} to pink dye of mending named "<##FFC0CB>&lPink Chat Color" with lore "&7&lCost: 2 Tokens" with all item flags hidden
+    set {ChatColor5GuiItem} to white dye of mending named "&f&lWhite Chat Color" with lore "&7&lCost: 2 Tokens" with all item flags hidden
+        
+function tokenShop(p: player):        
+    set {_gui} to a new chest inventory with 5 row with name "&e&lTokens Shop:"
+    set slot 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43 and 44 of {_gui} to black stained glass pane named " " 
+    set slot 11 of {_gui} to {ChatColor1GuiItem}
+    set slot 12 of {_gui} to {ChatColor2GuiItem}
+    set slot 13 of {_gui} to {ChatColor3GuiItem}
+    set slot 14 of {_gui} to {ChatColor4GuiItem}
+    set slot 15 of {_gui} to {ChatColor5GuiItem}
+    if {Tokens::%uuid of {_p}%} is higher than or equal to 1:
+        set slot 31 of {_gui} to gold block of mending named "&7Balance: &f%{Tokens::%uuid of {_p}%}%" with all flags hidden
+    else:
+        set slot 31 of {_gui} to gold block of mending named "&7Balance: &f0" with all flags hidden
+    open {_gui} to {_p} 
+
+on inventory click:
+    if name of event-inventory is "&e&lTokens Shop:":
+        cancel events
+        if event-slot is 11:
+            if {ChatColorRed::%uuid of player%} is not set:
+                if {Tokens::%uuid of player%} is higher than or equal to 2:
+                    play sound "block.grindstone.use" with volume 0.5 to the player
+                    subtract 2 from {Tokens::%uuid of player%}
+                    close the inventory of player
+                    send "&fYou bought &c&lRed Chat Color!" to player
+                    set {ChatColorRed::%uuid of player%} to true
+                else:
+                    send "&cYou don't have enough Tokens to buy this!" to player
+            else:
+                send "&c&lYou already own this Chat Color!"
+
+        if event-slot is 12:
+            if {ChatColorGreen::%uuid of player%} is not set:              
+                if {Tokens::%uuid of player%} is higher than or equal to 2:
+                    play sound "block.grindstone.use" with volume 0.5 to the player
+                    subtract 2 from {Tokens::%uuid of player%}
+                    close the inventory of player
+                    send "&fYou bought &2&lGreen Chat Color!" to player
+                    set {ChatColorGreen::%uuid of player%} to true
+                else:
+                    send "&cYou don't have enough Tokens to buy this!" to player
+            else:
+                send "&c&lYou already own this Chat Color!"
+                
+        if event-slot is 13:
+            if {ChatColorBlue::%uuid of player%} is not set:
+                if {Tokens::%uuid of player%} is higher than or equal to 2:
+                    play sound "block.grindstone.use" with volume 0.5 to the player
+                    subtract 2 from {Tokens::%uuid of player%}
+                    close the inventory of player
+                    send "&fYou bought &1&lBlue Chat Color!" to player
+                    set {ChatColorBlue::%uuid of player%} to true
+                else:
+                    send "&cYou don't have enough Tokens to buy this!" to player
+            else:
+                send "&c&lYou already own this Chat Color!"
+
+        if event-slot is 14:
+            if {ChatColorPink::%uuid of player%} is not set:
+                if {Tokens::%uuid of player%} is higher than or equal to 2:
+                    play sound "block.grindstone.use" with volume 0.5 to the player
+                    subtract 2 from {Tokens::%uuid of player%}
+                    close the inventory of player
+                    send "&fYou bought <##FFC0CB>&lPink Chat Color!" to player
+                    set {ChatColorPink::%uuid of player%} to true
+                else:
+                    send "&cYou don't have enough Tokens to buy this!" to player
+            else:
+                send "&c&lYou already own this Chat Color!"
+
+        if event-slot is 15:
+            if {ChatColorWhite::%uuid of player%} is not set:
+                if {Tokens::%uuid of player%} is higher than or equal to 2:
+                    play sound "block.grindstone.use" with volume 0.5 to the player
+                    subtract 2 from {Tokens::%uuid of player%}
+                    close the inventory of player
+                    send "&fYou bought &f&lWhite Chat Color!" to player
+                    set {ChatColorWhite::%uuid of player%} to true
+                else:
+                    send "&cYou don't have enough Tokens to buy this!" to player
+            else:
+                send "&c&lYou already own this Chat Color!"
+				
+command /tokens-gui:
+    permission: op
+    permission message: &4Stop! &cYou cant use this command!
+    trigger:
+        tokenShop(player)            
+
+command /givetokens <player> <number>:
+    permission: op
+    permission message: &4Stop! &cYou cant use this command!
+    trigger:
+        if argument 1 is not set:
+            send "Incorect usage: /givetokens <player> <amount>" to player
+        else if argument 2 is not set:
+            send "Incorect usage: /givetokens <player> <amount>" to player
+        else:
+            add arg-2 to {Tokens::%uuid of argument 1%}
+            send "&7Gave %{argument 1}% %{argument 2}% Tokens!" to player
+    
+command /settokens <player> <number>:
+    permission: op
+    permission message: &4Stop! &cYou cant use this command!
+    trigger:
+        if argument 1 is not set:
+            send "Incorect usage: /settokens <player> <amount>" to player
+        else if argument 2 is not set:
+            send "Incorect usage: /settokens <player> <amount>" to player
+        else:
+            set {Tokens::%uuid of argument 1%} to argument 2
+            send "&7Set %{argument 1}%'s Tokens to %{argument 2}%!" to player
+
+command /restettokens <player>:
+    permission: op
+    permission message: &4Stop! &cYou cant use this command!
+    trigger:
+        if argument 1 is not set:
+            send "Incorect usage: /restettokens <player>" to player
+        else:
+            set {Tokens::%uuid of argument 1%} to 0
+            send "&7Set %{argument 1}%'s Tokens to 0!" to player
+
+options:
+    # COMMAND
+        # whether or not players are allowed to fly (Can be disabled in a event of glitch/bug)
+        allowed-flying: true
+
+        # The message that the player receives when activating flight mode
+        flying-activation-message: &aFlight mode enabled.
+
+        # The message that the player receives when deactivating flight mode
+        flying-deactivation-message: &cFlight mode disabled.
+
+command /fly:
+    aliases: f, flight, flying, fl # Different commands players can run to activate this command
+    description: Toggles flight mode for the player. # Sets description of the flight command
+    executable by: players # Only players are allowed to run this command
+    permission: system.core.flight
+    trigger:
+        if "{@allowed-flying}" is true: # Check if flying is allowed globaly
+            if player is flying: # Check if player is already flying
+                set fly mode of player to false # Cancel player flight
+                send "{@flying-deactivation-message}"to player # Send message to player
+            else:
+                set fly mode of player to true # Give player flight 
+                send "{@flying-activation-message}" to player # Send message to player

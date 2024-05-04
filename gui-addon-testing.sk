@@ -1,0 +1,12 @@
+command /opengui:
+  trigger:
+    create a gui with virtual chest inventory with 3 rows named "My EPIC GUI!" and shape "xxxxxxxxx", "x-------x", and "xxxxxxxxx":
+      make gui slot "x" with dirt named "! BORDER !":
+        send "Say goodbye to your GUI border %player%!" to player
+        remove gui slot "x"
+      run on gui open:
+        send "Welcome to this GUI %player%!" to player
+      run on gui close:
+        # cancel gui close
+        send "Thanks for visiting this GUI %player%!" to player
+    open the last gui for the player

@@ -1,0 +1,98 @@
+command /Quests:
+    trigger:
+        set {_gui} to a new chest inventory with 3 row with name "Quests:"
+        set slot 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 19, 20, 21, 22, 23, 24, 25 and 26 of {_gui} to black stained glass pane named " "
+        set slot 10 of {_gui} to book named "&eHidden Souls" with lore "&7This is the first quest! Find the player's" and "&7head somewhere around the map!" with all flags hidden
+        set slot 11 of {_gui} to book named "&eA little cave" with lore "&7This quest is about doing a little mining, to do more...!" with all flags hidden
+        set slot 12 of {_gui} to book named "&7Unammed" with lore "&7This quest has no purpose!" with all flags hidden
+        set slot 13 of {_gui} to book named "&7Unammed" with lore "&7This quest has no purpose!" with all flags hidden
+        set slot 14 of {_gui} to book named "&7Unammed" with lore "&7This quest has no purpose!" with all flags hidden
+        set slot 15 of {_gui} to book named "&7Unammed" with lore "&7This quest has no purpose!" with all flags hidden
+        set slot 16 of {_gui} to book named "&7Unammed" with lore "&7This quest has no purpose!" with all flags hidden
+        if {Quest::%uuid of player%::1} is true:
+            set slot 10 of {_gui} to enchanted book named "&eThis Quest is done!" with lore "&7This is the first quest! Find the player's" and "&7head somewhere around the map!" with all flags hidden
+        if {Quest::%uuid of player%::1} is true:
+            set slot 12 of {_gui} to enchanted book named "&eThis Quest is done!" with lore "&7This quest is about doing a little mining, to do more...!" and "&7head somewhere around the map!" with all flags hidden
+        if {Quest::%uuid of player%::1} is true:
+            set slot 14 of {_gui} to enchanted book named "&eThis Quest is done!" with lore "&7This is the first quest! Find the player's" and "&7head somewhere around the map!" with all flags hidden
+        if {Quest::%uuid of player%::1} is true:
+            set slot 16of {_gui} to enchanted book named "&eThis Quest is done!" with lore "&7This quest is about doing a little mining, to do more...!" and "&7head somewhere around the map!" with all flags hidden
+        open {_gui} to player
+
+on inventory click:
+    if name of event-inventory is "Quests:":
+        cancel event
+        if event-slot is 10:
+            if {Quest::%uuid of player%::1} is not set:
+                set {Quest::%uuid of player%::1} to false
+                send "&7Selected &eHidden Souls!" to player
+            if {Quest::%uuid of player%::1} is true:
+                send "&cYou have already completed this quest!" to player
+                cancel event
+            if {Quest::%uuid of player%::1} is false:
+                send "&7You already selected &eHidden Souls!"
+
+        if event-slot is 11:
+            if {Quest::%uuid of player%::2} is not set:
+                set {Quest::%uuid of player%::2} to false
+                send "&7Selected &eA little cave!" to player
+                send "&#17FB64U&#2CF660p&#41F25Dd&#56ED59a&#6BE855t&#80E451e&#96DF4Ed &#ABDB4AQ&#C0D646u&#D5D142e&#EACD3Fs&#FFC83Bt &e""A little cave""&#FFC83B:" to player
+                send "&7Talk to the &fCave Miner" to player
+                send " " to player
+            if {Quest::%uuid of player%::2} is true:
+                send "&cYou have already completed this quest!" to player
+                cancel event
+            if {Quest::%uuid of player%::2} is false:
+                send "&7You already selected &eA little cave!"
+                                                                                                                                                                                  
+on right click on entity:
+    if name of entity is "&7Cave Miner (&aRight Click&7)":
+        if {comletedNPC::%uuid of player%::CaveMiner} is true
+            send "&7You helped me, thank you!" to player
+        else if player's inventory contains 1500 stone:
+            remove 1500 stone from player
+            send "&2You have finished the ""&7A Little Cave&7"" quest!" to player
+			send "&2here are you're rewards:" to player
+            send "" to player
+            play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        else:
+            send "&7Bring me more! 1500 to be exact!" 
+            play sound "entity.experience_orb.pickup" with volume 0.2 to the player 
+
+    if name of entity is "&7Astronaut (&aRight Click&7)":
+        # Aditional info:: the amount of items and the type can be changed 
+        # Very important:: When a player selected this quest {Astronaut::%uuid of player%} must be set to true to be able to talk to the astronaut
+        if {Astronaut::%uuid of player%::1} is flase
+            if #check the armour slots:
+                if player's inventory contains 15000 end stone:
+                    remove 15000 end stone from player
+                    # Update the name of the quest in the next line!
+                    send "&aYou have finished the ""&7Name of quest&7"" quest!" to player
+                    send "&ahere are you're rewards:" to player
+                    # Update the next lines to display the reward item and give it to the player!
+                    send "&7    &bExample item"
+                    send "" to player
+                    play sound "block.grindstone.use" with volume 0.5 to the player
+                else:
+                    send "&7You need a bit more than that, 15,000 to be precise!" to player
+            else: 
+                send "&7I like you, just not right now. Come back later..." to player
+        else:
+            send "&7You need to come back later..." to player
+
+# Hidden Souls Quest
+on right click:
+	if location of event-block is {quest1location}:
+		if {Quest::%uuid of player%::1} is not set:
+			send "&7You need the &eSouls Finder&7 Quest!"
+		if {Quest::%uuid of player%::1} is true:
+			send "&cYou have already found this!" to player
+		if {Quest::%uuid of player%::1} is false:
+			set {Quest::%uuid of player%::1} to true
+			send "&2You have finished the souls finder quest!" to player
+			send "&2here are you're rewards:" to player
+
+on place:
+    if name of player's tool is "&e&lHidden Soul":
+        set {quest1location} to location of event-block
+        message "&eYour current Quest 1, is located at &a%{quest1location}%"

@@ -1,0 +1,10 @@
+on join:
+    if {VanishBool::%uuid of player%} is ture:
+        send "&cPlayer %player% joined the server in vanish!" to players
+
+on command "/vanish":
+    if {VanishBool::%uuid of player%} is true:
+        set {VanishBool::%uuid of player%} to false
+    else:
+        set {VanishBool::%uuid of player%} to true
+        send "&7Player %player% went into Vanish!" to players

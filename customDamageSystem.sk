@@ -1,0 +1,58 @@
+on join:
+    set {_player} to the uuid of the player
+    if {_player}'s NBT contains "Health":
+        set {_health} to {_player}'s NBT value of "Health"
+        if {_health} is not 20:
+            set {_player}'s health to {_health}
+    else:
+        set {_player}'s NBT value of "Health" to 20
+        set {_player}'s health to 20
+
+on damage:
+    cancel event
+    set {_attacker} to attacker
+    set {_victim} to victim
+    set {_attackerItem} to tool of {_attacker}
+    set {_damage} to 1
+    if {_attackerItem}'s NBT contains "Damage":
+        set {_damage} to {_attackerItem}'s NBT value of "Damage"
+    set {_victimHealth} to {_victim}'s health - {_damage}
+    if {_victimHealth} <= 0:
+        set {_victimHealth} to 0
+    {_victim}'s health is {_victimHealth}        
+
+command /damage-read:
+    trigger:
+        if player's hand is set:
+            set {_item} to player's tool
+            set {_nbt} to nbt of {_item}
+            if {_nbt}.contains("Damage"):
+                send "Item Damage: %{_nbt::Damage}%"
+            else:
+                send "No Damage data found for this item."
+        else:
+            send "You are not holding anything."
+
+command /damage-write <number>:
+    trigger:
+        if player's hand is set:
+            set {_item} to player's tool
+            set {_nbt} to nbt of {_item}
+            {_nbt} set "Damage" to arg-1
+            set nbt of {_item} to {_nbt}
+            send "&cSet Damage of this item to %arg-1%." to player
+        else:
+            send "You are not holding anything."
+
+on damage:
+    cancel event
+
+on server start:
+    loop all players:
+        set {_player} to loop-player's uuid
+        if {_player}'s NBT contains "Health":
+            set {_health} to {_player}'s NBT value of "Health"
+            if {_health} is 0 or {_health} is below 0:
+                send "&c&lYou died!" to loop-player
+                send "&c&l%{name of player}% died to Something Scary!"
+                play sound "entity.player.death" to the dead player

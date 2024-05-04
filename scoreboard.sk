@@ -1,0 +1,13 @@
+every tick:
+	loop all players:
+		set title of loop-player's scoreboard to "  &4&lAltering &c&lSMP  "
+		set line 10 of loop-player's scoreboard to " "
+		set line 9 of loop-player's scoreboard to "&fPlayer: %loop-player%"
+		set line 8 of loop-player's scoreboard to "&fRank: "
+		set line 7 of loop-player's scoreboard to "&c---------------------"
+		set line 6 of loop-player's scoreboard to "&6Money: &e%{Money::%uuid of loop-player%}%"
+		set line 5 of loop-player's scoreboard to "&6Level: &e%{Level::%uuid of loop-player%}%"
+		set line 4 of loop-player's scoreboard to "&6XP: &e%{XP::%uuid of loop-player%}%&8/&e%{XPReq::%uuid of loop-player%}%"
+		set line 3 of loop-player's scoreboard to "&6Bounty: &e$%{Bounty::%uuid of loop-player%}%"
+		set line 2 of loop-player's scoreboard to "&cKills: %{Kills::%uuid of loop-player%}%"
+		set line 1 of loop-player's scoreboard to "&4Deaths: %{Deaths::%uuid of loop-player%}%

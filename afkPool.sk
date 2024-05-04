@@ -1,0 +1,124 @@
+command /afk [<string>] [<string>]:
+    trigger:
+        if player is op:
+            if arg-1 is "setrewardkey":
+                set {AFK_REWARD_KEY} to player's tool
+                send "&aReward keyin'" to player
+
+            else if arg-1 is "setreward":
+                set {AFK_REWARD} to player's tool
+                send "&aRewardin'" to player
+            else:
+                teleport player to {AFK}
+        else:
+            teleport player to {AFK}
+
+on tab complete of "/afk":
+    set tab completions for position 1 to "setrewardkey" and "setreward"
+
+on join:
+    while player is online:
+        # remove if you want to crash server
+        wait a second
+
+        afkTick(player)
+
+# go
+on quit:
+    delete {AFK_TIMER::%player%}
+
+# function
+function afkTick(p: player):
+    if "%regions at {_p}%" contains "afk":
+        set {AFK_TIMER::%{_p}%} to {AFK_TIMER::%{_p}%} ? now
+
+        # string parse
+        set {_str} to "%difference between now and 10 minutes from {AFK_TIMER::%{_p}%}%"
+        replace all " and " in {_str} with ", "
+        if {_str} contains ".":
+            set {_str::*} to {_str} split at "." and " seconds" if {_str} contains "."
+            set {_str} to "%{_str::1}%%{_str::3}%"
+            # 21 ticks prevents flutter where tick times vary
+        send title "&a&lAFK Timer" with subtitle "&7&d%{_str}%" to {_p} for 2 seconds with fade in 0 ticks and fade out 0 ticks
+
+        # cooldown
+        if difference between now and {AFK_TIMER::%{_p}%} is greater than 10 minutes:
+            give {AFK_REWARD_KEY} to {_p}
+
+            # Set the coin amount for default players, then add onto it accordingly for ranked players.
+            set {_coins} to 80
+            set {_coins} to (150) if {_p} has permission "group.vip"
+            set {_coins} to (250) if {_p} has permission "group.vip+"
+            set {_coins} to (400) if {_p} has permission "group.mvp"
+            set {_coins} to (600) if {_p} has permission "group.mvp+"
+            set {_coins} to (850) if {_p} has permission "group.legend"
+            set {_coins} to (1400) if {_p} has permission "group.immortal"
+
+            add {_coins} to {pdata::COINS::%{_p}'s uuid%}
+            send action bar "&e+%{_coins}% Coins!" to {_p}
+
+            # Set the AFK reward amount for default players, then add onto it accordingly for players with certain AFK point values
+            if {_afk.points::%player%} < 20:
+                give {AFK_REWARD} to {_p}
+            if {_afk.points::%player%} >= 20:
+                give 2 {AFK_REWARD} to {_p}
+            if {_afk.points::%player%} >= 40:
+                give 3 {AFK_REWARD} to {_p}
+            if {_afk.points::%player%} >= 60:
+                give 4 {AFK_REWARD} to {_p}
+            if {_afk.points::%player%} >= 80:
+                give 5 {AFK_REWARD} to {_p}
+            if {_afk.points::%player%} >= 100:
+                give 6 {AFK_REWARD} to {_p}
+            if {_afk.points::%player%} >= 120:
+                give 7 {AFK_REWARD} to {_p}
+            if {_afk.points::%player%} >= 140:
+                give 8 {AFK_REWARD} to {_p}
+            if {_afk.points::%player%} >= 160:
+                give 9 {AFK_REWARD} to {_p}
+            if {_afk.points::%player%} >= 180:
+                give 10 {AFK_REWARD} to {_p}
+
+            
+
+            play sound "ENTITY_EXPERIENCE_ORB_PICKUP" to {_p}
+            delete {AFK_TIMER::%{_p}%}
+
+    else:
+        delete {AFK_TIMER::%{_p}%}
+
+
+on first join:
+    set {_afk.points::%player%} to 0
+	
+
+
+every 10 minutes:
+    loop all players:
+        if "%region at loop-player%" contains "afk":
+            if difference between now and {AFK_TIMER::%loop-player%} is greater than 10 minutes:
+                add 1 to {_afk.points::%player%} 
+
+every 2 ticks:
+    loop all players:
+        if "%region at loop-player%" contains "afk":
+            if {_afk.points::%loop-player%} < 20:
+                send action bar "&bYou currently have &e%{_afk.points::%player%} &bAFK points, Reach 20 AFK points to receive a &e2x &bToken Multiplier" to loop-player
+            if {_afk.points::%loop-player%} >= 20:
+                send action bar "&bYou currently have &e%{_afk.points::%player%} &bAFK points, Reach 40 AFK points to receive a &e3x &bToken Multiplier" to loop-player
+            if {_afk.points::%loop-player%} >= 40:
+                send action bar "&bYou currently have &e%{_afk.points::%player%} &bAFK points, Reach 60 AFK points to receive a &e4x &bToken Multiplier" to loop-player
+            if {_afk.points::%loop-player%} >= 60:
+                send action bar "&bYou currently have &e%{_afk.points::%player%} &bAFK points, Reach 80 AFK points to receive a &e5x &bToken Multiplier" to loop-player
+            if {_afk.points::%loop-player%} >= 80:
+                send action bar "&bYou currently have &e%{_afk.points::%player%} &bAFK points, Reach 100 AFK points to receive a &e6x &bToken Multiplier" to loop-player
+            if {_afk.points::%loop-player%} >= 100:
+                send action bar "&bYou currently have &e%{_afk.points::%player%} &bAFK points, Reach 120 AFK points to receive a &e7x &bToken Multiplier" to loop-player
+            if {_afk.points::%loop-player%} >= 120:
+                send action bar "&bYou currently have &e%{_afk.points::%player%} &bAFK points, Reach 140 AFK points to receive a &e8x &bToken Multiplier" to loop-player
+            if {_afk.points::%loop-player%} >= 140:
+                send action bar "&bYou currently have &e%{_afk.points::%player%} &bAFK points, Reach 160 AFK points to receive a &e9x &bToken Multiplier" to loop-player
+            if {_afk.points::%loop-player%} >= 160:
+                send action bar "&bYou currently have &e%{_afk.points::%player%} &bAFK points, Reach 180 AFK points to receive a &e10x &bToken Multiplier" to loop-player
+            if {_afk.points::%loop-player%} >= 180:
+                send action bar "&bYou currently have &e%{_afk.points::%player%} &bAFK points, You've reached the highest Token Multiplier of &e10x" to loop-player

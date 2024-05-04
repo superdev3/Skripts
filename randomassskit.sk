@@ -1,0 +1,35 @@
+#Scripting For Party System
+on inventory click:
+  if name of event-inventory is "         &5Dungeon Selector":
+    if clicked slot is 15:
+      set {_gui} to a chest inventory with 3 rows named "         &5Joinable Parties"
+      loop {dungeon lobbies::*}:
+        set {_dungeon_item} to {dungeon lobbies::%loop-index%::icon} named {dungeon lobbies::%loop-index%::name}
+        add {_dungeon_item} to {_gui}
+      open {_gui} to player
+
+on inventory click:
+  if name of event-inventory is " &5Difficulty for &2Sweltering Swamp":
+    if clicked slot is 10:
+      set {_player} to player
+      set {_skull} to {_player}'s skull
+      set {_skull}'s owner to {_player}
+      set {_item} to {_player}'s head named "Sweltering Swamp Easy" with lore "%{_player}%'s Party"
+      
+      # Update creator's party GUI
+      set {_creator_gui} to a chest inventory with 3 rows named "Your Party"
+      set slot 0 of {_creator_gui} to {_item}
+      loop {dungeon lobbies::%{_player}%::*}:
+        add {dungeon lobbies::%{_player}%::item} to {_creator_gui}
+      open {_creator_gui} to {_player}
+      
+      # Adding the newly created dungeon to the Joinable Parties GUI for all players
+      loop {dungeon lobbies::*}:
+        set {_dungeon_item} to {dungeon lobbies::%loop-index%::icon} named {dungeon lobbies::%loop-index%::name}
+        add {_dungeon_item} to {_gui}
+      add {_item} to {_gui}
+      
+      # Reopen Joinable Parties GUI for all players except the creator
+      loop all players:
+        if loop-player is not {_player}:
+          open {_gui} to loop-player

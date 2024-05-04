@@ -1,0 +1,586 @@
+every second:
+	loop all players:
+		if {Money::%uuid of loop-player%} is not set:
+			set {Money::%uuid of loop-player%} to 0
+		if {Kills::%uuid of loop-player%} is not set:
+			set {Kills::%uuid of loop-player%} to 0
+		if {Deaths::%uuid of loop-player%} is not set:
+			set {Deaths::%uuid of loop-player%} to 0
+		if {Bounty::%uuid of loop-player%} is not set:
+			set {Bounty::%uuid of loop-player%} to 1
+		if {BlocksBroken::%uuid of loop-player%} is not set:
+			set {BlocksBroken::%uuid of loop-player%} to 0
+		if {Level::%uuid of loop-player%} is not set:
+			set {Level::%uuid of loop-player%} to 0
+		if {XP::%uuid of loop-player%} is not set:
+			set {XP::%uuid of loop-player%} to 0
+		if {XPReq::%uuid of loop-player%} is not set:
+			set {XPReq::%uuid of loop-player%} to 0
+	
+every tick:
+	loop all players:
+		set title of loop-player's scoreboard to "  &4&lAltering &c&lSMP  "
+		set line 10 of loop-player's scoreboard to " "
+		set line 9 of loop-player's scoreboard to "&fPlayer: %loop-player%"
+		set line 8 of loop-player's scoreboard to "&fRank: "
+		set line 7 of loop-player's scoreboard to "&c---------------------"
+		set line 6 of loop-player's scoreboard to "&6Money: &e%{Money::%uuid of loop-player%}%"
+		set line 5 of loop-player's scoreboard to "&6Level: &e%{Level::%uuid of loop-player%}%"
+		set line 4 of loop-player's scoreboard to "&6XP: &e%{XP::%uuid of loop-player%}%&8/&e%{XPReq::%uuid of loop-player%}%"
+		set line 3 of loop-player's scoreboard to "&6Bounty: &e$%{Bounty::%uuid of loop-player%}%"
+		set line 2 of loop-player's scoreboard to "&cKills: %{Kills::%uuid of loop-player%}%"
+		set line 1 of loop-player's scoreboard to "&4Deaths: %{Deaths::%uuid of loop-player%}%
+
+command /gamble:
+	trigger:
+		gambleMarket(player)
+
+command /bal:
+	trigger:
+		send "&eYou currently have: &c%{Money::%uuid of player%}%" to player
+		play sound "entity.experience_orb.pickup" to player
+
+
+command /pay <offline player> <number>:
+	trigger:
+		if arg-2 is higher than {Money::%uuid of player%}:
+			send "&cYou don't have enough money!" to player
+		else:
+			subtract arg-2 from {Money::%uuid of player%}
+			add arg-2 to {Money::%uuid of arg-1%}
+			send "&aYou have received a pay of %arg-2%, from %player%" to arg-1
+			send "&cYou have paid %arg-1% %arg-2%" to player
+
+
+   
+command /corertp:
+	cooldown: 10 seconds
+	cooldown message: &4Stop! &cYou can only teleport to a random location every 10 seconds.
+	permission: rtp.use
+	permission message: &cYou do not have permission to use this command
+	trigger:
+		set {_x} to round(random number between -100000 and 100000)
+		set {_z} to round(random number between -100000 and 100000)
+		set {_block} to block at location at ({_x}, 0, {_z}) in world event-world
+		loop all blocks above {_block}:
+			if loop-block is air:
+				block below loop-block is not water
+				block below loop-block is not air
+				if block above loop-block is air:
+					teleport player to loop-block
+					send "&aTeleported to a random location" to player
+
+command /shop:
+	trigger:
+		set {_gui} to a new chest inventory with 6 row with name "Shop Menu"
+		set slot 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 44, 45, 46, 47, 48, 49, 50, 51, 52 and 53 of {_gui} to black stained glass pane named " "
+		set slot 39 of {_gui} to grass block named "&eBlocks" with all flags hidden
+		set slot 30 of {_gui} to wheat seed named "&eSeeds" with all flags hidden
+		set slot 21 of {_gui} to diamond pickaxe named "&eTools" with all flags hidden
+		set slot 12 of {_gui} to diamond named "&eItems" with all flags hidden
+		set slot 13 of {_gui} to chainmail chestplate named "&eArmor" with all flags hidden
+		set slot 14 of {_gui} to book named "&eAuction House" with lore "&cComing Soon!" with all flags hidden
+		set slot 23 of {_gui} to endstone named "&eThe End" with lore "&cComing Soon!" with all flags hidden
+		set slot 32 of {_gui} to chest named "&ePlayer Trading" with lore "&cComing Soon!" with all flags hidden
+		set slot 41 of {_gui} to bottle o' enchanting named "&eKill Effects" with all flags hidden
+		set slot 31 of {_gui} to player's head named "&eStats" with all flags hidden
+		open {_gui} to player
+command /multarrow:
+	permission: op
+	trigger:
+		loop 5 times:
+			make player shoot arrow at speed 3
+			wait 1 tick
+
+command /wipe [<offline player>]:
+	permission: op
+	trigger:
+		if arg-1 is set:
+			clear arg-1's inventory
+			clear arg-1's ender chest
+			set {Money::%uuid of arg-1%} to 0
+			clear {CurrentKillEffect::%uuid of arg-1%}
+			clear {KillEffect.%uuid of arg-1%::*}
+			set {Deaths::%uuid of arg-1%} to 0
+			set {Kills::%uuid of arg-1%} to 0
+			set {Bounty::%uuid of arg-1%} to 0
+			set {BlocksBroken::%uuid of arg-1%} to 0
+			set {XP::%uuid of arg-1%} to 0
+			set {XPReq::%uuid of arg-1%} to 50
+			set {Level::%uuid of arg-1%} to 0
+			set {SendRankup::%uuid of arg-1%} to 0
+		else:
+			clear player's inventory
+			clear player's ender chest
+			set {Money::%uuid of player%} to 0
+			clear {CurrentKillEffect::%uuid of player%}
+			clear {KillEffect.%uuid of player%::*}
+			set {Deaths::%uuid of player%} to 0
+			set {Kills::%uuid of player%} to 0
+			set {Bounty::%uuid of player%} to 0
+			set {BlocksBroken::%uuid of player%} to 0
+			set {XPReq::%uuid of player%} to 50
+			set {XP::%uuid of player%} to 0
+			set {Level::%uuid of player%} to 0
+			set {SendRankup::%uuid of player%} to 0
+
+command /givememoney <number>:
+	permission: op,console
+	trigger:
+		add arg-1 to {Money::%uuid of player%}
+		send "&aYou gave yourself %arg-1%"
+		play sound "entity.experience_orb.pickup" to player
+
+command /perks:
+	trigger:
+		set {_gui} to a new chest inventory with 3 row with name "Perks Menu"
+		set slot 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25 and 26 of {_gui} to black stained glass pane named " "
+		if {Perk1::%uuid of player%} is "Second Wind I":
+			set slot 11 of {_gui} to leather boots named "&eSecond Wind I" with lore "&7Right click to use Second Wind." and "" and "&7Gain a &espeed &7boost, being faster for" and "&7a couple of seconds." and "" and "&cCooldown &7on 2 seconds" and "" and "&f&lBASIC PERK" with all flags hidden
+		else if {Perk1::%uuid of player%} is "Adrenaline Shot I":
+			set slot 11 of {_gui} to potion of healing named "&eAdrenaline Shot I" with lore "&7Right click to use Adrenaline Shot." and "" and "&7When players are nearby, gain a slight &espeed" and "&7boost, and &estrength &7to defend yourself" and "&7of any &cdanger&7." and "" and "&cCooldown &7on 30 seconds" and "" and "&f&lBASIC PERK" with all flags hidden
+		else if {Perk1::%uuid of player%} is "Gold Rush I":
+			set slot 11 of {_gui} to a gold ingot named "&eGold Rush I" with lore "&7Gold Rush will always be on." and "" and "&7When killing, or completing quests/missions" and "&7you will receive more Money than usual." and "" and "&cHas no cooldown." and "" and "&f&lBASIC PERK" with all flags hidden
+		else if {Perk1::%uuid of player%} is "Blood Thirsty I":
+			set slot 11 of {_gui} to a golden apple named "&eBlood Thirsty I" with lore "&7Right click to use Blood Thirsty." and "" and "&7Boost your strength and health regeneration" and "&7making you stronger in combat." and "" and "&cCooldown &7on 30 seconds" and "" and "&f&lBASIC PERK"
+		else if {PerkOwned.%uuid of {_p}%::FlightI} is true:
+			set slot 11 of {_gui} to barrier named "&eFlight I" with lore "&7Right click to use Flight." and "" and "&7When using flight, you gain a temporary" and "&7flight duration. " and "" and "&cCooldown &7on 50 seconds" and "" and "&f&lBASIC PERK"
+
+		else:
+			set slot 11 of {_gui} to barrier named "&cNo perks selected." with lore "&7You have no perks selected. Buy perks to equip perks."
+
+		set slot 15 of {_gui} to iron sword of mending named "&ePerk Shop" with lore "&7Visit the perk shop, to buy perks" with all flags hidden
+		open {_gui} to player
+
+command /christmas:
+    trigger:
+        execute player command "/warp christmas"
+        send "&7Welcome to &achristmas &7town!" to player
+        play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+
+command /keyall:
+    permission: op, console
+    trigger:
+        send title "&aKeyall &fin 10 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 9 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 8 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 7 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player 
+        wait 1 seconds
+        send title "&aKeyall &fin 6 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 5 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 4 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 3 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 2 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        wait 1 seconds
+        send title "&aKeyall &fin 1 sec!" with subtitle "Have fun, spend quick!" to all players for 5 seconds
+		play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        send "&bHey player, you got a key!" to all players
+        execute console command "excellentcrates key giveall key_all_crate_key 1"
+        send title "&f&l&ks &6&lKeyall over! &f&l&ks" with subtitle " " to all players for 3 seconds
+
+function deathMessages(p: player):
+	set {_gui} to a new chest inventory with 3 row with name "Death Messages Page 1"
+	set slot 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 19, 20, 21, 22, 23, 24, 25 and 26 of {_gui} to black stained glass pane named " "
+	set slot 10 of {_gui} to paper named "&c%{_p}% was slaughtered" with lore "&7This message will appear in chat when you die." and "" and "&6&lCosts:" and "&8- &e$150"
+	if {DeathMessage.%uuid of {_p}%::Slaughter} is true:
+		set slot 10 of {_gui} to paper named "&c%{_p}% was slaughtered" with lore "&7This message will appear in chat when you die." and "" and "&aAlready bought"
+
+function killEffects(p: player):
+	set {_gui} to a new chest inventory with 3 row with name "Kill Effects Page 1"
+	set slot 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 19, 20, 21, 22, 23, 24, 25 and 26 of {_gui} to black stained glass pane named " "
+	set slot 10 of {_gui} to paper named "&eCloud Effect" with lore "&7Displays cloud effects when killing" and "" and "&6&lCosts:" and "&8- &e$100"
+	if {KillEffect.%uuid of {_p}%::CloudEffect} is true:
+		set slot 10 of {_gui} to paper of mending named "&eCloud Effect" with lore "&7Displays cloud effects when killing" and "" and "&aAlready Bought!"
+	set slot 11 of {_gui} to paper named "&eFirework Dust" with lore "&7Displays firework dust when killing" and "" and "&6&lCosts:" and "&8- &e$150"
+	if {KillEffect.%uuid of {_p}%::FireworkEffect} is true:
+		set slot 11 of {_gui} to paper of mending named "&eFirework Dust" with lore "&7Displays firework dust when killing" and "" and "&aAlready bought!"
+	open {_gui} to {_p}
+
+
+
+
+
+function blockShop(p: player):
+	set {_gui} to a new chest inventory with 5 row with name "Blocks"
+	set slot 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 37, 38, 39, 40, 41, 42, 43 and 44 of {_gui} to black stained glass pane named " "
+	set slot 10 of {_gui} to dirt block named "&eDirt Block" with lore "&7Buy 5 dirt blocks for &e$1" and "" and "&eRight&7-click to sell (unavailable)" and "&eLeft&7-click to buy"
+	set slot 11 of {_gui} to grass block named "&eGrass Block" with lore "&7Buy 5 grass blocks for &e$1" and "" and "&eRight&7-click to sell (unavailable)" and "&eLeft&7-click to buy"
+	set slot 12 of {_gui} to oak log named "&eOak Wood" with lore "&7Buy 5 oak wood for &e$1" and "" and "&eRight&7-click to sell ($0.5 each)" and "&eLeft&7-click to buy"
+	open {_gui} to {_p}
+
+function itemShop(p: player):
+	set {_gui} to a new chest inventory with 5 row with name "Items"
+	set slot 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 37, 38, 39, 40, 41, 42, 43 and 44 of {_gui} to black stained glass pane named " "
+	set slot 10 of {_gui} to coal named "&eCoal" with lore "&7Buy 5 coal for &e$3" and "" and "&eRight&7-click to sell ($0.5 each)" and "&eLeft&7-click to buy"
+	set slot 11 of {_gui} to iron ingot named "&eIron Ingot" with lore "&6Buy 5 Iron Ingots for $7" and "" and "&eRight&7-click to sell ($1 each)" and "&eLeft&7-click to buy"
+	set slot 12 of {_gui} to gold ingot named "&eGold Ingot" with lore "&6Buy 5 Gold Ingots for $12" and "" and "&eRight&7-click to sell ($2 each)" and "&eLeft&7-click to buy"
+	set slot 11 of {_gui} to lapis lazuli named "&eLapis Lazuli" with lore "&6Buy 5 Iron Ingots for $3" and "" and "&eRight&7-click to sell ($1 each)" and "&eLeft&7-click to buy"
+
+function gambleMarket(p: player):
+	set {_gui} to a new chest inventory with 3 row with name "Gamble Market"
+	set slot 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 19, 20, 21, 22, 23, 24, 25 and 26 of {_gui} to black stained glass pane named " "
+	set slot 12 of {_gui} to green concrete named "&eStill under construction!" with lore "&7Gamble your money for a price (maybe)" and "" and "&6&lCosts:" and "&8- &6$300"
+	open {_gui} to {_p}
+
+function perkShop(p: player):
+	set {_gui} to a new chest inventory with 5 row with name "Perk Shop"
+	set slot 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 37, 38, 39, 40, 41, 42, 43 and 44 of {_gui} to black stained glass pane named " "
+	set slot 10 of {_gui} to leather boots named "&eSecond Wind I" with lore "&7Right click to use Second Wind." and "" and "&7Gain a &espeed &7boost, being faster for" and "&7a couple of seconds." and "" and "&cCooldown &7on 30 seconds" and "" and "&6&lCosts:" and "&8- &e$250" with all flags hidden
+
+	if {PerkOwned.%uuid of {_p}%::SecondWindI} is true:
+
+		set slot 10 of {_gui} to leather boots named "&eSecond Wind I" with lore "&7Right click to use Second Wind." and "" and "&7Gain a &espeed &7boost, being faster for" and "&7a couple of seconds." and "" and "&cCooldown &7on 30 seconds" and "" and "&aAlready bought!" with all flags hidden
+
+	set slot 11 of {_gui} to potion of healing named "&eAdrenaline Shot I" with lore "&7Right click to use Adrenaline Shot." and "" and "&7When players are nearby, gain a slight &espeed" and "&7boost, and &estrength &7to defend yourself" and "&7of any &cdanger&7." and "" and "&cCooldown &7on 30 seconds" and "" and "&6&lCosts:" and "&8- &e$650" with all flags hidden
+
+	if {PerkOwned.%uuid of {_p}%::AdrenalineShotI} is true:
+
+		set slot 11 of {_gui} to potion of healing named "&eAdrenaline Shot I" with lore "&7Right click to use Adrenaline Shot." and "" and "&7When players are nearby, gain a slight &espeed" and "&7boost, and &estrength &7to defend yourself" and "&7of any &cdanger&7." and "" and "&cCooldown &7on 30 seconds" and "" and "&aAlready bought!" with all flags hidden
+
+	set slot 12 of {_gui} to a gold ingot named "&eGold Rush I" with lore "&7Gold Rush will always be on." and "" and "&7When killing or something to give you gold, you will" and "&7receive more Money than usual." and "" and "&cHas no cooldown." and "" and "&6&lCosts:" and "&8- &e$450" with all flags hidden
+
+	if {PerkOwned.%uuid of {_p}%::GoldRushI} is true:
+
+		set slot 12 of {_gui} to a gold ingot named "&eGold Rush I" with lore "&7Gold Rush will always be on." and "" and "&7When killing or something to give you gold, you will" and "&7receive more Money than usual." and "" and "&cHas no cooldown." and "" and "&aAlready Bought!" with all flags hidden
+
+	set slot 13 of {_gui} to a golden apple named "&eBlood Thirsty I" with lore "&7Right click to use Blood Thirsty." and "" and "&7Boost your strength and health regeneration" and "&7making you stronger in combat." and "" and "&cCooldown &7on 30 seconds" and "" and "&6&lCosts:" and "&8- &e$700"
+
+	if {PerkOwned.%uuid of {_p}%::BloodThirstyI} is true:
+
+		set slot 13 of {_gui} to a golden apple named "&eBlood Thirsty I" with lore "&7Right click to use Blood Thirsty." and "" and "&7Boost your strength and health regeneration" and "&7making you stronger in combat." and "" and "&cCooldown &7on 30 seconds" and "" and "&aAlready Bought!" with all flags hidden
+
+	set slot 14 of {_gui} to barrier named "&eFlight I" with lore "&7Right click to use Flight." and "" and "&7When using flight, you gain a temporary" and "&7flight duration. " and "" and "&cCooldown &7on 50 seconds" and "" and "&6&lCosts:" and "&8- &e$1000"
+	if {PerkOwned.%uuid of {_p}%::FlightI} is true:
+		set slot 14 of {_gui} to barrier named "&eFlight I" with lore "&7Right click to use Flight." and "" and "&7When using flight, you gain a temporary" and "&7flight duration. " and "" and "&cCooldown &7on 50 seconds" and "" and "&f&lBASIC PERK"
+	open {_gui} to {_p}
+
+function yourPerks(p: player):
+	set {_gui} to a new chest inventory with 5 row with name "Your Perks"
+	set slot 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 37, 38, 39, 40, 41, 42, 43 and 44 of {_gui} to black stained glass pane named " "
+	set slot 10 of {_gui} to barrier named "&cSecond Wind I" with lore "&7Buy this perk in the perk shop!"
+	if {PerkOwned.%uuid of {_p}%::SecondWindI} is true:
+		set slot 10 of {_gui} to leather boots named "&eSecond Wind I" with lore "&7Right click to use Second Wind." and "" and "&7Gain a &espeed &7boost, being faster for" and "&7a couple of seconds." and "" and "&cCooldown &7on 2 seconds" and "" and "&f&lBASIC PERK" with all flags hidden
+
+	set slot 11 of {_gui} to barrier named "&cAdrenaline Shot I" with lore "&7Buy this perk in the perk shop!"
+	if {PerkOwned.%uuid of {_p}%::AdrenalineShotI} is true:
+		set slot 11 of {_gui} to potion of healing named "&eAdrenaline Shot I" with lore "&7Right click to use Adrenaline Shot." and "" and "&7When players are nearby, gain a slight &espeed" and "&7boost, and &estrength &7to defend yourself" and "&7of any &cdanger&7." and "" and "&cCooldown &7on 30 seconds" and "" and "&f&lBASIC PERK" with all flags hidden
+
+	set slot 12 of {_gui} to barrier named "&cGold Rush I" with lore "&7Buy this perk in the perk shop!"
+	if {PerkOwned.%uuid of {_p}%::GoldRushI} is true:
+		set slot 12 of {_gui} to a gold ingot named "&eGold Rush I" with lore "&7Gold Rush will always be on." and "" and "&7When killing or something to give you gold, you will" and "&7receive more Money than usual." and "" and "&cHas no cooldown." and "" and "&f&lBASIC PERK" with all flags hidden
+
+	set slot 13 of {_gui} to barrier named "&cBlood Thirsty I" with lore "&7Buy this perk in the perk shop!"
+	if {PerkOwned.%uuid of {_p}%::BloodThirstyI} is true:
+		set slot 13 of {_gui} to a golden apple named "&eBlood Thirsty I" with lore "&7Right click to use Blood Thirsty." and "" and "&7Boost your strength and health regeneration" and "&7making you stronger in combat." and "" and "&cCooldown &7on 30 seconds" and "" and "&f&lBASIC PERK"
+
+	set slot 14 of {_gui} to barrier named "&cFlight I" with lore "&7Buy this perk in the perk shop!"
+	if {PerkOwned.%uuid of {_p}%::FlightI} is true:
+		set slot 14 of {_gui} to barrier named "&eFlight I" with lore "&7Right click to use Flight." and "" and "&7When using flight, you gain a temporary" and "&7flight duration. " and "" and "&cCooldown &7on 50 seconds" and "" and "&f&lBASIC PERK"
+	open {_gui} to {_p}
+
+on inventory click:
+	if name of event-inventory is "Kill Effects Page 1":
+		if event-slot is between 0 and 26:
+			cancel event
+		if event-slot is 10:
+			if {KillEffect.%uuid of player%::CloudEffect} is not true:
+				if {Money::%uuid of player%} is higher than 99:
+					subtract 100 from {Money::%uuid of player%}
+					set {KillEffect.%uuid of player%::CloudEffect} to true
+					play sound "minecraft.entity.experience_orb.pickup" to player
+					close player's inventory
+					player command "killeffects"
+			else:
+				set {CurrentKillEffect::%uuid of player%} to "Cloud Effect"
+
+		if event-slot is 11:
+			if {KillEffect.%uuid of player%::FireworkEffect} is not true:
+				if {Money::%uuid of player%} is higher than 149:
+					subtract 100 from {Money::%uuid of player%}
+					set {KillEffect.%uuid of player%::FireworkEffect} to true
+					play sound "minecraft.entity.experience_orb.pickup" to player
+					close player's inventory
+					player command "killeffects"
+			else:
+				set {CurrentKillEffect::%uuid of player%} to "Firework Effect"
+
+
+
+
+	if name of event-inventory is "Death Messages":
+		if event-slot is between 0 and 26:
+			cancel event
+		if event-slot is 10:
+			if {Money::%uuid of player%} is higher than 149:
+				subtract 150 from {Money::%uuid of player%}
+				set {DeathMessage.%uuid of player%::Slaughter} to true
+				play sound "minecraft.entity.experience_orb.pickup" to player
+				close player's inventory
+				player command "shop"
+
+on inventory click:
+	if name of event-inventory is "Shop Menu":
+		if event-slot is between 0 and 53:
+			cancel event
+		if event-slot is 41:
+			killEffects(player)
+		if event-slot is 39:
+			blockShop(player)
+
+	if name of event-inventory is "Blocks":
+		if event-slot is between 0 and 53:
+			cancel event
+
+	if name of event-inventory is "Items":
+		if event-slot is between 0 and 53:
+			cancel event
+
+on death:
+	add 1 to {Deaths::%uuid of victim%}
+	if attacker is a player:
+		if {CurrentKillEffect::%uuid of attacker%} is "Cloud Effect":
+			draw 100 cloud at location 0.75 meter above victim with offset vector(0.65, 0.5, 0.65) with extra 0
+		if {CurrentKillEffect::%uuid of attacker%} is "Firework Effect":
+			draw 100 firework at location 0.75 meter above victim with offset vector(0.5, 0.75, 0.5) with extra 0
+		set {BountyMoney} to {Bounty::%uuid of victim%}
+		if victim is not warden or wither or ender dragon:
+			add 2 to {XP::%uuid of attacker%}
+		if victim is a warden:
+			add 10000 to {Level::%uuid of attacker%}
+			add 5000 to {Money::%uuid of attacker%}
+			set {Bounty::%uuid of victim%} to 0
+			send "&cYou have received &e$900&c &c+ &e$%{BountyMoney}%&c, from killing %victim%" to attacker
+		if victim is a wither:
+			add 1500 to {Level::%uuid of attacker%}
+			add 300 to {Money::%uuid of attacker%}
+			set {Bounty::%uuid of victim%} to 0
+			send "&cYou have received &e$900&c &c+ &e$%{BountyMoney}%&c, from killing %victim%" to attacker
+		if victim is a ender dragon:
+			add 100000 to {XP::%uuid of attacker%}
+			add 10000 to {Money::%uuid of attacker%}
+			set {Bounty::%uuid of victim%} to 0
+			send "&cYou have received &e$900&c &c+ &e$%{BountyMoney}%&c, from killing %victim%" to attacker
+		if victim is a player:
+			add 150 to {XP::%uuid of attacker%}
+			add 1 to {Kills::%uuid of attacker%}
+		wait 2 ticks
+		while {XP::%uuid of attacker%} is higher than or equal to {XPReq::%uuid of attacker%}:
+			add 1 to {Level::%uuid of attacker%}
+			subtract {XPReq::%uuid of attacker%} from {XP::%uuid of attacker%}
+			add 50 to {XPReq::%uuid of attacker%}
+			play sound "minecraft:entity.experience_orb.pickup" at pitch 2 to attacker
+			add 1 to {SendRankup::%uuid of attacker%}
+			wait 1 tick
+			if {SendRankup::%uuid of attacker%} is higher than or equal to 10:
+				send "&ePlayer &8[&e%{Level::%uuid of attacker%}%&8] &a%attacker%&e has level up to %{Level::%uuid of attacker%}%" to all players
+				clear {SendRankup::%uuid of attacker%}
+			wait 1 tick
+
+on inventory click:
+	if name of event-inventory is "Perks Menu":
+		if event-slot is between 0 and 26:
+			cancel event
+		if event-slot is 11:
+			yourPerks(player)
+		if event-slot is 15:
+			perkShop(player)
+
+	if name of event-inventory is "Perk Shop":
+		if event-slot is between 0 and 44:
+			cancel event
+		if event-slot is 10:
+			if {Money::%uuid of player%} is higher than 249:
+				if {PerkOwned.%uuid of player%::SecondWindI} is not true:
+					subtract 250 from {Money::%uuid of player%}
+					set {PerkOwned.%uuid of player%::SecondWindI} to true
+					close player's inventory
+					player command "perks"
+		if event-slot is 11:
+			if {Money::%uuid of player%} is higher than 399:
+				if {PerkOwned.%uuid of player%::AdrenalineShotI} is not true:
+					subtract 400 from {Money::%uuid of player%}
+					set {PerkOwned.%uuid of player%::AdrenalineShotI} to true
+					close player's inventory
+					player command "perks"
+		if event-slot is 12:
+			if {Money::%uuid of player%} is higher than 449:
+				if {PerkOwned.%uuid of player%::GoldRushI} is not true:
+					subtract 450 from {Money::%uuid of player%}
+					set {PerkOwned.%uuid of player%::GoldRushI} to true
+					close player's inventory
+					player command "perks"
+		if event-slot is 13:
+			if {Money::%uuid of player%} is higher than 574:
+				if {PerkOwned.%uuid of player%::BloodThirstyI} is not true:
+					subtract 575 from {Money::%uuid of player%}
+					set {PerkOwned.%uuid of player%::BloodThirstyI} to true
+					close player's inventory
+					player command "perks"
+		if event-slot is 11:
+			if {Money::%uuid of player%} is higher than 399:
+				if {PerkOwned.%uuid of player%::AdrenalineShotI} is not true:
+					subtract 400 from {Money::%uuid of player%}
+					set {PerkOwned.%uuid of player%::AdrenalineShotI} to true
+					close player's inventory
+					player command "perks"
+
+	if name of event-inventory is "Your Perks":
+		if event-slot is between 0 and 44:
+			cancel event
+		if event-slot is 10:
+			if {PerkOwned.%uuid of player%::SecondWindI} is true:
+				set {Perk1::%uuid of player%} to "Second Wind I"
+				close player's inventory
+				player command "perks"
+		if event-slot is 11:
+			if {PerkOwned.%uuid of player%::AdrenalineShotI} is true:
+				set {Perk1::%uuid of player%} to "Adrenaline Shot I"
+				close player's inventory
+				player command "perks"
+		if event-slot is 12:
+			if {PerkOwned.%uuid of player%::GoldRushI} is true:
+				set {Perk1::%uuid of player%} to "Gold Rush I"
+				close player's inventory
+				player command "perks"
+		if event-slot is 13:
+			if {PerkOwned.%uuid of player%::BloodThirstyI} is true:
+				set {Perk1::%uuid of player%} to "Blood Thirsty I"
+				close player's inventory
+				player command "perks"
+
+on right click:
+	if player is sneaking:
+		if {Perk1::%uuid of player%} is "Second Wind I":
+			if difference between {PerkCooldown::%uuid of player%} and now is less than 20 seconds:
+				message "&cStill on cooldown!" to player
+			else:
+				set {PerkCooldown::%uuid of player%} to now
+				apply potion of swiftness of tier 2 to player for 2 seconds
+				play sound "minecraft:block.beacon.activate" at pitch 1 to player
+				draw 20 cloud at location 0.5 meter above player with offset vector(0.5,0.5,0.5) with extra 0
+		else if {Perk1::%uuid of player%} is "Adrenaline Shot I":
+			if difference between {PerkCooldown::%uuid of player%} and now is less than 25 seconds:
+				message "&cStill on cooldown!" to player
+			else:
+				set {PerkCooldown::%uuid of player%} to now
+				draw 50 cloud at location 0.5 meter above player with offset vector(0.5, 1, 0.5) with extra 0
+				loop 5 times:
+					loop all entities in radius 5 of player:
+						loop-entity is not player:
+							apply potion of swiftness of tier 1 to player for 1 second
+							apply potion of strength of tier 1 to player for 1 second
+					wait 1 second
+		else if {Perk1::%uuid of player%} is "Blood Thirsty I":
+			if difference between {PerkCooldown::%uuid of player%} and now is less than 35 seconds:
+				message "&cStill on cooldown!" to player
+			else:
+				set {PerkCooldown::%uuid of player%} to now
+				draw 250 flame at location 0.25 meter above player with offset vector(3, 0, 3) with extra 0
+				play sound "minecraft:block.beacon.activate"
+				apply potion of strength of tier 1 to player for 5 seconds
+				apply potion of regeneration of tier 2 to player for 5 seconds
+
+on right click:
+	set {_Tool} to player's held item
+	if name of {_Tool} contains "Money":
+		if name of {_Tool} contains "50":
+			remove paper named "&e$50 Paper Money" from player
+			add 50 to {Money::%uuid of player%}
+		if name of {_Tool} contains "75":
+			remove paper named "&e$75 Paper Money" from player
+			add 75 to {Money::%uuid of player%}
+		if name of {_Tool} contains "100":
+			remove paper named "&e$100 Paper Money" from player
+			add 100 to {Money::%uuid of player%}
+		if name of {_Tool} contains "150":
+			remove paper named "&e$150 Paper Money" from player
+			add 150 to {Money::%uuid of player%}
+		if name of {_Tool} contains "250":
+			remove paper named "&e$250 Paper Money" from player
+			add 250 to {Money::%uuid of player%}
+
+on break:
+	if event-block is not grass or tall grass or dead bush or sugar cane:
+		add 1 to {BlocksBroken::%uuid of player%}
+
+on inventory click:
+	if name of event-inventory is "Gamble Market":
+		cancel event
+		if event-slot is 12:
+			if difference between now and {GambleCooldown::%uuid of player%} is less than 2 seconds:
+				send "&cThere is a short cooldown!" to player
+				play sound "minecraft:entity.villager.no" to player
+			else:
+				set {GambleCooldown::%uuid of player%} to now
+				set {_number} to random integer between 1 and 200
+				if {_number} is between 1 and 150:
+					send "&cYou lost!"
+					play sound "minecraft:block.beacon.deactivate"
+				if {_number} is between 151 and 200:
+					send "&aYou won!"
+					play sound "minecraft:block.beacon.activate"
+
+on join:
+	if {Removeallseason2::%uuid of player%} is not true:
+		set {Removeallseason2::%uuid of player%} to true
+		clear player's inventory
+		clear player's ender chest
+		set {Money::%uuid of player%} to 0
+		clear {CurrentKillEffect::%uuid of player%}
+		clear {KillEffect.%uuid of player%::*}
+		set {Deaths::%uuid of player%} to 0
+		set {Kills::%uuid of player%} to 0
+		set {Bounty::%uuid of player%} to 0
+		set {BlocksBroken::%uuid of player%} to 0
+		set {XP::%uuid of player%} to 0
+		set {XPReq::%uuid of player%} to 50
+		set {Level::%uuid of player%} to 0
+		set {PerkOwned.%uuid of player%::SecondWindI} to false
+		set {PerkOwned.%uuid of player%::AdrenalineShotI} to false
+		set {PerkOwned.%uuid of player%::GoldRushI} to false
+		set {PerkOwned.%uuid of player%::BloodThirstyI} to false
+		clear {Perk1::%uuid of player%}
+
+on right click:
+    if name of player's tool is "&7Selector (&aRight Click&7)":
+        cancel event
+        set {_gui} to a new chest inventory with 3 row with name "&fServers:"
+        set slot  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25 and 26 of {_gui} to black stained glass pane named " " with all flags hidden
+        set slot 10 of {_gui} to Lime Concrete named "&aAlise"
+        set slot 12 of {_gui} to Red Concrete named "&cLifesteal"
+        set slot 14 of {_gui} to Yellow Concrete named "&eInfuse"
+        set slot 16 of {_gui} to Green Concrete named "&2Survival"
+        open {_gui} to player
+        play sound "entity.experience_orb.pickup" to player
+        
+on inventory click:
+    if name of event-inventory is "&fServers:":
+        cancel event
+        if event-slot is 10:
+            send "&7Sending you to&a Alise!" to player
+            play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        if event-slot is 12:
+            send "&7Sending you to&c Lifesteal!" to player
+            play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        if event-slot is 14:
+            send "&7Sending you to&e Infuse!" to player
+            play sound "entity.experience_orb.pickup" with volume 0.5 to the player
+        if event-slot is 16:
+            send "&7Sending you to&2 Survival!" to player
+            play sound "entity.experience_orb.pickup" with volume 0.5 to the players

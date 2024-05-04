@@ -1,0 +1,329 @@
+options:
+	# PERMISSIONS
+		# whether or not the permission should be required to use
+		permission-required: false
+		# what permission is required to open any shulker box
+		permission: bsb.use
+		# permission required by admins to unlock locked shulker boxes using the command
+		permission-admin: bsb.admin
+		# message to send when a user doesn't have the required permission node to unlock shulker boxes
+		permission-message: &cYou do not have permission to this. &7&o(Missing node 'bsb.use')
+		# message to send when a user doesn't have the required permission node to unlock shulker boxes
+		permission-message-admin: &cYou do not have permission to this.
+		# how the message should be displayed to the player
+		permission-message-format: actionbar # accepted entries are 'actionbar', 'title', 'message' (using any other will effectively disable this)
+
+
+	# MISCELLANEOUS
+		# whether or not players should be allowed to place shulker boxes
+		place-shulkers: false
+		# whether or not players opening shulker boxes by shift clicking in the inventory
+		open-with-sneaking: false
+
+	# COOLDOWN
+		# whether or not a cooldown should be applied to opening shulker boxes
+		cooldown-enabled: true
+		# how long a cooldown duration should last on the items
+		cooldown-duration: 3 seconds
+		# cooldown bypass permission to allow admins to freely open shulker boxes
+		cooldown-bypass-permission: bsb.admin
+		# message to send when attempting to open a shulker box while on cooldown
+		# you can use '%{_remaining}%' to showcase how much longer
+		cooldown-message: &cYou're currently on cooldown for another %{_remaining}%
+		# whether or not the skript should send a message when trying to open a shulker box while on cooldown
+		cooldown-message-enabled: true
+		# how the message should be displayed to the player
+		cooldown-message-format: actionbar # accepted entries are 'actionbar', 'title', 'message' (using any other will effectively disable this)
+
+	# SOUNDS
+		# Note: setting any of the sounds to 'none' will disable the functionality
+		# sound to play when a user opens a shulker box
+		sounds-open: block.shulker_box.open
+		# sound to play when a user closes a shulker box
+		sounds-close: block.shulker_box.close
+		# sound to play when a user attempts to open a locked shulker box
+		sounds-locked: block.chest.locked
+		# sound to play when a user attempts to open a shulker box while on cooldown
+		sounds-cooldown: block.chest.locked
+		# sound to player when a user doesn't have the requiered permission
+		sounds-permission: block.chest.locked
+
+	# LOCKED STATE
+		# message to send when attempting to open a locked shulker box
+		locked-message: &cThis shulker box is currently locked, please ask an admin to unlock!
+		# whether or not the skript should attempt to lock suspicious shulker boxes
+		locked-enabled: true
+		# whether or not the skript should send a message when attempting to open a locked shulker box
+		locked-message-enabled: true
+		# how the message should be displayed to the player
+		locked-message-format: actionbar # accepted entries are 'actionbar', 'title', 'message' (using any other will effectively disable this)
+		# disable dispenser message when they are locked
+		# you can use '%{_amount}%' for the amount of locked shulkers in the dispenser
+		locked-dispenser: &cInactivated dispenser contains &6%{_amount}% &clocked shulker/s, so it is inoperable.
+		# message to send when attempting to drop a locked shulker
+		Locked-dropped: &cLocked items cannot be dropped
+
+	# LOCKED REASON
+		# listed below are possible reasons for shulker's lockup
+		locked-reason-1: Containing illegible items.
+		locked-reason-2: Suspicious of duplicate.
+		locked-reason-3: Other reason.
+
+	# CLARIFICATION
+		# as a clarification of the locks, locks prevent the duplication; the shulker gets locked when it's opened,
+		# then unlocked when it's closed. Whenever a shulker is closed without a packet, a lock remains.
+
+#----------------------------------------------------------------
+
+#--------------------------
+#	Command (Unlocking)
+#--------------------------
+# Handle the ShulkerBoxes command
+command /ShulkerBoxes [<text>] [<text>]:
+	aliases: bsb
+	trigger:
+		if player has permission "{@permission-admin}":
+			if player is not holding any shulker box:
+				send "&eMake sure to hold a shulker box"
+				stop
+			if arg-1 is "lock":
+				set uuid tag "BlockEntityTag;PublicBukkitValues;skbee-custom;locked" of nbt of player's tool to player
+				if arg-2 is set:
+					set string tag "BlockEntityTag;PublicBukkitValues;skbee-custom;lockedreason" of nbt of player's tool to "%arg-2 ? "NOT SET"%"
+				BSBCommandGui(player)
+			if arg-1 is "unlock":
+				BSBunlock(player)
+				BSBCommandGui(player)
+			if arg-1 is not set:
+				BSBCommandGui(player)
+		else:
+			parse if "{@permission-message-format}" is "actionbar":
+				send action bar "{@permission-message-admin}" to player
+			else parse if "{@permission-message-format}" is "title":
+				reset title of player
+				send title "&4&lAUTHORIZATION" with subtitle "{@permission-message-admin}" to player for 0.5 seconds with fadein 0 seconds with fadeout a second
+			else parse if "{@permission-message-format}" is "message":
+				send "{@permission-message-admin}" to player
+# Handle inventory clicks for BetterShulkerBoxes command
+on inventory click:
+	if player's current inventory is metadata value "BSB;GUI-Inside" of player:
+		cancel event
+		BSBCommandGui(player) if event-slot is slot 35 of player's current inventory
+	if player's current inventory is metadata value "BSB;GUI" of player:
+		cancel event
+		if event-slot is slot 0 of player's current inventory:
+			set metadata tag "BSB;GUI-Inside" of player to chest inventory with 4 rows with name "%name of slot 0 of player's current inventory ? "Shulker box"%"
+			set {_items::*} to compound list tag "BlockEntityTag;Items" of nbt of slot 0 of player's current inventory
+			loop {_items::*}:
+				set {_loopSlot} to int tag "Slot" of loop-value
+				set {_loopItem} to item from nbt loop-value
+				set slot {_loopSlot} of (metadata tag "BSB;GUI-Inside" of player) to {_loopItem}
+			set slot 35 of (metadata tag "BSB;GUI-Inside" of player) to arrow named "&aBack to Admin GUI"
+			open (metadata tag "BSB;GUI-Inside" of player) to player
+			stop
+		if BSBisLocked(player's tool) is false:
+			if event-slot is slot 3 of player's current inventory:
+				BSBlock(player, "{@locked-reason-1}")
+			if event-slot is slot 4 of player's current inventory:
+				BSBlock(player, "{@locked-reason-2}")
+			if event-slot is slot 5 of player's current inventory:
+				BSBlock(player, "{@locked-reason-3}")
+		else:
+			if event-slot is slot 4 of player's current inventory:
+				BSBunlock(player)
+		BSBCommandGui(player)
+
+#--------------------------
+#	Events (Interacting)
+#--------------------------
+
+# This is the main event
+on right click with any shulker box:
+	parse if {@permission-required} is true:
+		if player doesn't have permission "{@permission}":
+			parse if "{@permission-message-format}" is "actionbar":
+				send action bar "{@permission-message}" to player
+			else parse if "{@permission-message-format}" is "title":
+				reset title of player
+				send title "&4&lAUTHORIZATION" with subtitle "{@permission-message}" to player for 0.5 seconds with fadein 0 seconds with fadeout a second
+			else parse if "{@permission-message-format}" is "message":
+				send "{@permission-message}" to player
+			cancel event
+			stop
+	stop if exact target block of player is interactable
+	event-item is player's tool
+	cancel event if {@place-shulkers} is false
+	parse if {@open-with-sneaking} is true:
+		if player is not sneaking:
+			stop
+	if target entity is item frame, donkey or armor stand:
+		if distance between the player and location of target block <= 4:
+			stop
+	BSBCheckCooldown(player) is false
+	BSBCheckLockedState(player, event-item) is false
+	if player is holding event-item:
+		set metadata "BSB;ShulkerSlot" of player to hotbar slot of player
+	else:
+		# Used to determine offhand slot of player
+		set metadata "BSB;ShulkerSlot" of player to offhand tool of player
+	set uuid tag "BlockEntityTag;PublicBukkitValues;skbee-custom;locked" of nbt of event-item to player
+	BSBOpen(player, event-item)
+
+
+on inventory click:
+	clicked slot is any shulker box
+	event-inventory is inventory of player
+	parse if {@permission-required} is true:
+		if player doesn't have permission "{@permission}":
+			parse if "{@permission-message-format}" is "actionbar":
+				send action bar "{@permission-message}" to player
+			else parse if "{@permission-message-format}" is "title":
+				reset title of player
+				send title "&4&lAUTHORIZATION" with subtitle "{@permission-message}" to player for 0.5 seconds with fadein 0 seconds with fadeout a second
+			else parse if "{@permission-message-format}" is "message":
+				send "{@permission-message}" to player
+			cancel event
+			stop
+	if metadata "BSB;ShulkerSlot" of player is clicked slot:
+		cancel event
+		stop
+	stop if click action is not right mouse button
+	close player's inventory
+	cancel event
+	if BSBCheckCooldown(player) or BSBCheckLockedState(player, event-item) is true:
+		stop
+	set metadata "BSB;ShulkerSlot" of player to clicked slot
+	set uuid tag "BlockEntityTag;PublicBukkitValues;skbee-custom;locked" of nbt of clicked slot to player
+	BSBOpen(player, clicked slot)
+
+# When closing BetterShulkerInventory update the slot
+on inventory close:
+	player has metadata "BSB;ShulkerInv"
+	clear metadata "BSB;ShulkerInv" of player
+	loop items within event-inventory:
+		set {_item} to full nbt of loop-item
+		set tag "Slot" of {_item} to index of loop-slot
+		add {_item} to {_itemNBT::*}
+	set compound list tag "BlockEntityTag;Items" of nbt of (metadata "BSB;ShulkerSlot" of player) to {_itemNBT::*}
+	delete uuid tag "BlockEntityTag;PublicBukkitValues;skbee-custom;locked" of nbt of (metadata "BSB;ShulkerSlot" of player)
+	clear metadata "BSB;ShulkerSlot" of player
+	BSBPlaySound(player, "close")
+
+#disable the ability to spawn shulker using dispensers when they are locked
+
+on drop:
+	if name of player's inventory = name of (metadata tag "BSB;ShulkerInv" of player):
+		if metadata "BSB;ShulkerSlot" of player is set:
+			if BSBisLocked(event-item) is true:
+				cancel event
+				send "{@Locked-dropped}"
+on tool change:
+	if name of player's inventory = "Shulker box":
+		cancel event
+on death of a player:
+	if name of victim's inventory = name of (metadata tag "BSB;ShulkerInv" of victim):
+		set {_item} to metadata "BSB;ShulkerSlot" of victim
+		set {_items::*} to slots (integers between 0 and 26) of victim's current inventory
+		close victim's inventory
+
+on place of any shulker box:
+	cancel event if nbt of player's tool has tag "BlockEntityTag;PublicBukkitValues;skbee-custom;locked"
+
+#--------------------------
+#	FUNCTIONS
+#--------------------------
+# Open a shulker box using the BetterShulkerBox inventory
+function BSBOpen(player: player, item: item):
+	set metadata tag "BSB;ShulkerInv" of {_player} to shulker box inventory with name "%name of {_item} ? "Shulker box"%"
+	set {_items::*} to compound list tag "BlockEntityTag;Items" of nbt of {_item}
+	loop {_items::*}:
+		set {_loopSlot} to int tag "Slot" of loop-value
+		set {_loopItem} to item from nbt loop-value
+		set slot {_loopSlot} of (metadata tag "BSB;ShulkerInv" of {_player}) to {_loopItem}
+	open (metadata tag "BSB;ShulkerInv" of {_player}) to {_player}
+	BSBPlaySound({_player}, "open")
+
+function BSBPlaySound(player: player, sound: string):
+	if {_sound} is "locked":
+		parse if "{@sounds-locked}" is not "none":
+			play sound "{@sounds-locked}" at volume 2 with pitch 1 for {_player}
+	else if {_sound} is "cooldown":
+		parse if "{@sounds-cooldown}" is not "none":
+			play sound "{@sounds-cooldown}" at volume 2 with pitch 1 for {_player}
+	else if {_sound} is "permission":
+		parse if "{@sounds-permission}" is not "none":
+			play sound "{@sounds-permission}" at volume 2 with pitch 1 for {_player}
+	else if {_sound} is "open":
+		parse if "{@sounds-open}" is not "none":
+			play sound "{@sounds-open}" at volume 2 with pitch 1 for {_player}
+	else if {_sound} is "close":
+		parse if "{@sounds-close}" is not "none":
+			play sound "{@sounds-close}" at volume 2 with pitch 1 for {_player}
+
+function BSBCheckLockedState(player: player, item: object) :: boolean:
+	set {_state} to false
+	parse if {@locked-enabled} is true:
+		set {_nbt} to nbt of {_item}
+		if {_nbt} has tag "BlockEntityTag;PublicBukkitValues;skbee-custom;locked":
+			set {_state} to true
+		else if {_nbt} has tag "custom;locked":
+			set {_state} to true
+		{_player} is set
+		if {_state} is true:
+			BSBPlaySound({_player}, "locked")
+			parse if "{@locked-message-format}" is "actionbar":
+				send action bar "{@locked-message}" to {_player}
+			else parse if "{@locked-message-format}" is "title":
+				reset title of {_player}
+				send title "&4&lLOCKED" with subtitle "{@locked-message}" to {_player} for 0.5 seconds with fadein 0 seconds with fadeout a second
+			else parse if "{@locked-message-format}" is "message":
+				send "{@locked-message}" to {_player}
+	return {_state}
+
+function BSBCheckCooldown(player: player) :: boolean:
+	parse if {@cooldown-enabled} is true:
+		{_player} doesn't have permission "{@cooldown-bypass-permission}"
+		if now < metadata "BSB;ShulkerCooldown" of {_player}:
+			BSBPlaySound({_player}, "cooldown")
+			parse if {@cooldown-message-enabled} is true:
+				set {_remaining} to difference between now and metadata "BSB;ShulkerCooldown" of {_player}
+				parse if "{@cooldown-message-format}" is "actionbar":
+					send action bar "{@cooldown-message}" to {_player}
+				else parse if "{@cooldown-message-format}" is "title":
+					reset title of {_player}
+					send title "&4&lCOOLDOWN" with subtitle "{@cooldown-message}" to {_player} for 0.5 seconds with fadein 0 seconds with fadeout a second
+				else parse if "{@cooldown-message-format}" is "message":
+					send "{@cooldown-message}" to {_player}
+			return true
+		set metadata "BSB;ShulkerCooldown" of {_player} to {@cooldown-duration} later
+	return false
+
+function BSBCommandGui(player: player):
+	set metadata "BSB;GUI" of {_player} to chest inventory with 1 rows with name "&9Shulker ADMIN GUI"
+	if BSBisLocked({_player}'s tool) is true:
+		set {_view} to (uuid tag "BlockEntityTag;PublicBukkitValues;skbee-custom;locked" of nbt of {_player}'s tool) parsed as player
+		set {_reason} to tag "BlockEntityTag;PublicBukkitValues;skbee-custom;lockedreason" of nbt compound of {_player}'s tool
+		set slot 0 of metadata "BSB;GUI" of {_player} to {_player}'s tool with lore "&4&lLOCKED", "&7By &e%{_view}%", "&7For &e%{_reason} ? "Not set"%", "", "&a&l[ClICK TO VIEW]"
+		set slot 4 of metadata "BSB;GUI" of {_player} to Lime dye named "&aUNLOCK" with lore "", "&7Click here to unlock", "&7the shulker box."
+	else:
+		set slot 0 of metadata "BSB;GUI" of {_player} to {_player}'s tool with lore "", "&a&l[ClICK TO VIEW]"
+		set slot 3 of metadata "BSB;GUI" of {_player} to Red dye named "&aLOCK" with lore "", "&7Click here to lock", "&7the shulker box for", "&7{@locked-reason-1}"
+		set slot 4 of metadata "BSB;GUI" of {_player} to Red dye named "&aLOCK" with lore "", "&7Click here to lock", "&7the shulker box for", "&7{@locked-reason-2}"
+		set slot 5 of metadata "BSB;GUI" of {_player} to Red dye named "&aLOCK" with lore "", "&7Click here to lock", "&7the shulker box for", "&7{@locked-reason-3}"
+	open (metadata "BSB;GUI" of {_player}) to {_player}
+
+function BSBlock(player: player, string: string):
+	set uuid tag "BlockEntityTag;PublicBukkitValues;skbee-custom;locked" of nbt of {_player}'s tool to {_player}
+	set string tag "BlockEntityTag;PublicBukkitValues;skbee-custom;lockedreason" of nbt of {_player}'s tool to "%{_string}%"
+
+function BSBunlock(player: player):
+	delete uuid tag "BlockEntityTag;PublicBukkitValues;skbee-custom;locked" of nbt of {_player}'s tool
+	delete uuid tag "BlockEntityTag;PublicBukkitValues;skbee-custom;lockedreason" of nbt of {_player}'s tool
+
+function BSBisLocked(item: item) :: boolean:
+	set {_nbt} to (nbt compound of {_item})
+	set {_uuid} to (tag "BlockEntityTag;PublicBukkitValues;skbee-custom;locked" of {_nbt})
+	if {_uuid} is set:
+		return true
+	else:
+		return false
