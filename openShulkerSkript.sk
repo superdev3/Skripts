@@ -2,37 +2,37 @@ options:
 	# PERMISSIONS
 		# whether or not the permission should be required to use
 		permission-required: false
-		# what permission is required to open any shulker box
+		# What permission is required to open any shulker box
 		permission: bsb.use
-		# permission required by admins to unlock locked shulker boxes using the command
+		# Permission required by admins to unlock locked shulker boxes using the command
 		permission-admin: bsb.admin
 		# message to send when a user doesn't have the required permission node to unlock shulker boxes
 		permission-message: &cYou do not have permission to this. &7&o(Missing node 'bsb.use')
 		# message to send when a user doesn't have the required permission node to unlock shulker boxes
-		permission-message-admin: &cYou do not have permission to this.
+		permission-message-admin: &cYou do not have permission to do this.
 		# how the message should be displayed to the player
 		permission-message-format: actionbar # accepted entries are 'actionbar', 'title', 'message' (using any other will effectively disable this)
 
 
 	# MISCELLANEOUS
-		# whether or not players should be allowed to place shulker boxes
+		# Whether or not players should be allowed to place shulker boxes
 		place-shulkers: false
-		# whether or not players opening shulker boxes by shift clicking in the inventory
+		# Whether or not players open shulker boxes by shift-clicking in the inventory
 		open-with-sneaking: false
 
 	# COOLDOWN
-		# whether or not a cooldown should be applied to opening shulker boxes
+		# Whether or not a cooldown should be applied to opening shulker boxes
 		cooldown-enabled: true
-		# how long a cooldown duration should last on the items
+		# How long a cooldown duration should last on the items
 		cooldown-duration: 3 seconds
 		# cooldown bypass permission to allow admins to freely open shulker boxes
 		cooldown-bypass-permission: bsb.admin
 		# message to send when attempting to open a shulker box while on cooldown
 		# you can use '%{_remaining}%' to showcase how much longer
 		cooldown-message: &cYou're currently on cooldown for another %{_remaining}%
-		# whether or not the skript should send a message when trying to open a shulker box while on cooldown
+		# Whether or not the skript should send a message when trying to open a shulker box while on cooldown
 		cooldown-message-enabled: true
-		# how the message should be displayed to the player
+		# How the message should be displayed to the player
 		cooldown-message-format: actionbar # accepted entries are 'actionbar', 'title', 'message' (using any other will effectively disable this)
 
 	# SOUNDS
@@ -45,17 +45,17 @@ options:
 		sounds-locked: block.chest.locked
 		# sound to play when a user attempts to open a shulker box while on cooldown
 		sounds-cooldown: block.chest.locked
-		# sound to player when a user doesn't have the requiered permission
+		# sound to the player when a user doesn't have the required permission
 		sounds-permission: block.chest.locked
 
 	# LOCKED STATE
 		# message to send when attempting to open a locked shulker box
-		locked-message: &cThis shulker box is currently locked, please ask an admin to unlock!
-		# whether or not the skript should attempt to lock suspicious shulker boxes
+		locked-message: &cThis shulker box is currently locked, please ask an admin to unlock it!
+		# Whether or not the skript should attempt to lock suspicious shulker boxes
 		locked-enabled: true
 		# whether or not the skript should send a message when attempting to open a locked shulker box
 		locked-message-enabled: true
-		# how the message should be displayed to the player
+		# How the message should be displayed to the player
 		locked-message-format: actionbar # accepted entries are 'actionbar', 'title', 'message' (using any other will effectively disable this)
 		# disable dispenser message when they are locked
 		# you can use '%{_amount}%' for the amount of locked shulkers in the dispenser
@@ -64,13 +64,13 @@ options:
 		Locked-dropped: &cLocked items cannot be dropped
 
 	# LOCKED REASON
-		# listed below are possible reasons for shulker's lockup
+		# listed below are possible reasons for Shulker's lockup
 		locked-reason-1: Containing illegible items.
 		locked-reason-2: Suspicious of duplicate.
 		locked-reason-3: Other reason.
 
 	# CLARIFICATION
-		# as a clarification of the locks, locks prevent the duplication; the shulker gets locked when it's opened,
+		# as a clarification of the locks, locks prevent duplication; the shulker gets locked when it's opened,
 		# then unlocked when it's closed. Whenever a shulker is closed without a packet, a lock remains.
 
 #----------------------------------------------------------------
@@ -145,7 +145,7 @@ on right click with any shulker box:
 				send action bar "{@permission-message}" to player
 			else parse if "{@permission-message-format}" is "title":
 				reset title of player
-				send title "&4&lAUTHORIZATION" with subtitle "{@permission-message}" to player for 0.5 seconds with fadein 0 seconds with fadeout a second
+				send title "&4&lAUTHORIZATION" with subtitle "{@permission-message}" to player for 0.5 seconds with fade in 0 seconds with fadeout a second
 			else parse if "{@permission-message-format}" is "message":
 				send "{@permission-message}" to player
 			cancel event
