@@ -1,0 +1,3 @@
+command /tree:
+    trigger:
+        generate tree at location of player
