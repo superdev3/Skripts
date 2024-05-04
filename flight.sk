@@ -1,6 +1,6 @@
 options:
     # COMMAND
-        # whether or not players are allowed to fly (Can be disabled in a event of glitch/bug)
+        # whether or not players are allowed to fly (Can be disabled in a event of a glitch/bug)
         allowed-flying: true
 
         # The message that the player receives when activating flight mode
@@ -15,7 +15,7 @@ command /fly:
     executable by: players # Only players are allowed to run this command
     permission: itemedit.rename
     trigger:
-        if "{@allowed-flying}" is true: # Check if flying is allowed globaly
+        if "{@allowed-flying}" is true: # Check if flying is allowed globally
             if player is flying: # Check if player is already flying
                 set fly mode of player to false # Cancel player flight
                 send "{@flying-deactivation-message}"to player # Send message to player
