@@ -61,14 +61,14 @@ on right click on entity:
 
     if name of entity is "&7Astronaut (&aRight Click&7)":
         # Aditional info:: the amount of items and the type can be changed 
-        # Very important:: When a player selected this quest {Astronaut::%uuid of player%} must be set to true to be able to talk to the astronaut
+        # Very important:: When a player selects this quest {Astronaut::%uuid of player%} must be set to true to be able to talk to the astronaut
         if {Astronaut::%uuid of player%::1} is flase
             if #check the armour slots:
                 if player's inventory contains 15000 end stone:
                     remove 15000 end stone from player
                     # Update the name of the quest in the next line!
                     send "&aYou have finished the ""&7Name of quest&7"" quest!" to player
-                    send "&ahere are you're rewards:" to player
+                    send "&ahere are your rewards:" to player
                     # Update the next lines to display the reward item and give it to the player!
                     send "&7    &bExample item"
                     send "" to player
@@ -89,7 +89,7 @@ on right click:
 			send "&cYou have already found this!" to player
 		if {Quest::%uuid of player%::1} is false:
 			set {Quest::%uuid of player%::1} to true
-			send "&2You have finished the souls finder quest!" to player
+			send "&2You have finished the soul's finder quest!" to player
 			send "&2here are you're rewards:" to player
 
 on place:
