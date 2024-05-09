@@ -16,7 +16,7 @@ command /Quests:
         if {Quest::%uuid of player%::1} is true:
             set slot 14 of {_gui} to enchanted book named "&eThis Quest is done!" with lore "&7This is the first quest! Find the player's" and "&7head somewhere around the map!" with all flags hidden
         if {Quest::%uuid of player%::1} is true:
-            set slot 16of {_gui} to enchanted book named "&eThis Quest is done!" with lore "&7This quest is about doing a little mining, to do more...!" and "&7head somewhere around the map!" with all flags hidden
+            set slot 16 of {_gui} to enchanted book named "&eThis Quest is done!" with lore "&7This quest is about doing a little mining, to do more...!" and "&7head somewhere around the map!" with all flags hidden
         open {_gui} to player
 
 on inventory click:
@@ -95,4 +95,4 @@ on right click:
 on place:
     if name of player's tool is "&e&lHidden Soul":
         set {quest1location} to location of event-block
-        message "&eYour current Quest 1, is located at &a%{quest1location}%"
+        send "&eYour current Quest 1, is located at &a%{quest1location}%" to player
