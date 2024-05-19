@@ -1,7 +1,3 @@
-variables:
-		{global-flying} = true
-		# whether or not players are allowed to fly (Can be disabled in a event of a glitch/bug)
-
 options:
 	# The Message that gets send to everyone when flight gets forbidden
 	gf: &cFlying is not allowed anymore!
@@ -13,6 +9,10 @@ options:
 	flying-activation-message: &aFlight mode enabled.
 	# The message that the player receives when deactivating flight mode
 	flying-deactivation-message: &cFlight mode disabled.
+
+variables:
+		{global-flying} = true
+		# whether or not players are allowed to fly (Can be disabled in a event of a glitch/bug)
 
 command /fly:
 	aliases: f, , flying, fl # Different commands players can run to activate this command
