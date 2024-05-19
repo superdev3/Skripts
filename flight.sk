@@ -1,24 +1,44 @@
+variables:
+		{global-flying} = true
+		# whether or not players are allowed to fly (Can be disabled in a event of a glitch/bug)
+
 options:
-    # COMMAND
-        # whether or not players are allowed to fly (Can be disabled in a event of a glitch/bug)
-        allowed-flying: true
-
-        # The message that the player receives when activating flight mode
-        flying-activation-message: &aFlight mode enabled.
-
-        # The message that the player receives when deactivating flight mode
-        flying-deactivation-message: &cFlight mode disabled.
+	# The Message that gets send to everyone when flight gets forbidden
+	gf: &cFlying is not allowed anymore!
+	# The Message that gets send to everyone when flight gets allowed
+	gt: &aFlying is now allowed!
+	# Error Message when Global Flying is off
+	flying-not-allowed: &cFlying is currently deactivated!
+	# The message that the player receives when activating flight mode
+	flying-activation-message: &aFlight mode enabled.
+	# The message that the player receives when deactivating flight mode
+	flying-deactivation-message: &cFlight mode disabled.
 
 command /fly:
-    aliases: f, flight, flying, fl # Different commands players can run to activate this command
-    description: Toggles flight mode for the player. # Sets description of the flight command
-    executable by: players # Only players are allowed to run this command
-    permission: itemedit.rename
-    trigger:
-        if "{@allowed-flying}" is true: # Check if flying is allowed globally
-            if player is flying: # Check if player is already flying
-                set fly mode of player to false # Cancel player flight
-                send "{@flying-deactivation-message}"to player # Send message to player
-            else:
-                set fly mode of player to true # Give player flight 
-                send "{@flying-activation-message}" to player # Send message to player
+	aliases: f, , flying, fl # Different commands players can run to activate this command
+	description: Toggles flight mode for the player. # Sets description of the flight command
+	executable by: players # Only players are allowed to run this command
+	permission: fly.fly
+	trigger:
+		if {global-flying} is true: # Check if flying is allowed globally
+			if player is flying: # Check if player is already flying
+				set fly mode of player to false # Cancel player flight
+				send "{@flying-deactivation-message}" to player # Send message to player
+			else:
+				set fly mode of player to true # Give player flight 
+				send "{@flying-activation-message}" to player # Send message to player
+		else:
+			send "{@flying-not-allowed}" to player # Send Error Message to player
+command /fly-set:
+	description: Toggles if Flying should be allowed or not
+	executable by: console and players
+	permission: fly.set
+	trigger:
+		if {global-flying} is true: # Check if flying is allowed
+			set {global-flying} to false # Forbid Flying
+			send "{@gf}" to all players # Broadcast that Flying is now not allowed
+		else:
+			set {global-flying} to true # Allow Flying
+			send "{@gt}" to all players # Broadcast that Flying is not allowed
+
+# gt/f = Global Flight True/False
